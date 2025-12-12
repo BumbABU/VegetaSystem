@@ -69,11 +69,11 @@ namespace VegetaSystem
                 {
                     ObjPoolable obj = Instantiate(prefab);
                     obj.transform.SetParent(_parent[keyPool]);
-                    obj.Init(keyPool);
+                    obj.In_Init(keyPool);
                     return obj;
                 },
-                actionOnGet: obj => obj.Get(),
-                actionOnRelease: obj => obj.Release(),
+                actionOnGet: obj => obj.In_Get(),
+                actionOnRelease: obj => obj.In_Release(),
                 collectionCheck: true,
                 defaultCapacity: initAmount
             );
@@ -89,7 +89,7 @@ namespace VegetaSystem
             {
                 ObjPoolable obj = Instantiate(prefab);
                 obj.transform.SetParent(_parent[keyPool]);
-                obj.Init(keyPool);
+                obj.In_Init(keyPool);
                 pool.Release(obj);
             }
         }
@@ -131,7 +131,13 @@ namespace VegetaSystem
             {
                 if (obj == null) return;
 
-                string keyPool = obj.GetKeyPool();
+                if(obj.In_GetRelease() == true)
+                {
+                    Debug.Log($"Object with name {obj.name} is already release");
+                    return;
+                }
+
+                string keyPool = obj.In_GetKeyPool();
 
                 if (_pools.TryGetValue(keyPool, out var pool))
                 {
@@ -143,10 +149,10 @@ namespace VegetaSystem
                         }
                     }
                     pool.Release(obj);
-                }
+                } 
                 else
                 {
-                    Debug.LogWarning($"Pool {obj.GetKeyPool()} not found when releasing {obj.name}");
+                    Debug.LogWarning($"Pool {obj.In_GetKeyPool()} not found when releasing {obj.name}");
                     Destroy(obj.gameObject);
                 }
             }
